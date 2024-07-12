@@ -3,12 +3,13 @@ const { User } = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-AP
 
 const router = Router();
 
+// Helper function to handle errors
 const handleError = (err, res) => {
   console.error(err);
-  res.status(500).send('Something went wrong');
+  res.status(500).send(`Internal Server Error: ${err.message}`);
 };
 
-// api/users GET route
+// GET /api/users - Retrieve all users
 router.get('/', async (req, res) => {
   try {
     const users = await User.find();
@@ -18,13 +19,13 @@ router.get('/', async (req, res) => {
   }
 });
 
-// api/users POST route
+// POST /api/users - Create a new user
 router.post('/', async (req, res) => {
   try {
     const { username, email } = req.body;
 
     if (!username || !email) {
-      return res.status(400).send('Username and email are required');
+      return res.status(400).json({ message: 'Username and email are required' });
     }
 
     const user = new User({ username, email });
@@ -35,36 +36,91 @@ router.post('/', async (req, res) => {
   }
 });
 
-// api/users/id PUT route
-router.put('/:id', async (req, res) => {
+// GET /api/users/:id - Retrieve a user by ID
+router.get('/:id', async (req, res) => {
   try {
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: req.params.id },
-      { $set: { username: req.body.username, email: req.body.email } },
-      { new: true }
-    );
-    if (!updatedUser) {
+    const user = await User.findById(req.params.id);
+    if (!user) {
       res.status(404).json({ message: 'User not found' });
     } else {
-      res.json(updatedUser);
+      res.json(user);
     }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Something went wrong' });
+    handleError(err, res);
   }
 });
 
-// api/users/ id DELETE route
+// PUT /api/users/:id - Update a user
+router.put('/:id', async (req, res) => {
+  try {
+    const { username, email } = req.body;
+
+    if (!username || !email) {
+      return res.status(400).json({ message: 'Username and email are required' });
+    }
+
+    const user = await User.findByIdAndUpdate(req.params.id, { username, email }, { new: true });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.json(user);
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+});
+
+// DELETE /api/users/:id - Delete a user
 router.delete('/:id', async (req, res) => {
   try {
-    const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
-    if (!deletedUser) {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) {
       res.status(404).json({ message: 'User not found' });
     } else {
       res.status(204).json({ message: 'User deleted successfully' });
     }
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Something went wrong' });
+    handleError(err, res);
+  }
+});
+
+// POST /api/users/:userId/addFriend/:friendId - Add a friend to a user
+router.post('/:userId/addFriend/:friendId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const friendId = req.params.friendId;
+
+    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(friendId)) {
+      return res.status(400).json({ message: 'Invalid user or friend ID' });
+    }
+
+    const user = await User.findByIdAndUpdate(userId, { $push: { friends: friendId } }, { new: true });
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.json(user);
+    }
+  } catch (err) {
+    handleError(err, res);
+  }
+});
+
+// DELETE /api/users/:userId/removeFriend/:friendId - Remove a friend from a user
+router.delete('/:userId/removeFriend/:friendId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const friendId = req.params.friendId;
+
+    // Find the user and remove the friend from their friends list
+    const user = await User.findByIdAndUpdate(userId, { $pull: { friends: friendId } }, { new: true });
+
+    // Handle user not found
+    if (!user) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.json(user);
+    }
+  } catch (err) {
+    handleError(err, res);
   }
 });

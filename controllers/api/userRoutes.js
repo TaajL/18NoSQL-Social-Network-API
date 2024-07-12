@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const User = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-API/models/user.js');
+const { User } = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-API/models/user.js');
 
 const router = Router();
 
@@ -35,17 +35,36 @@ router.post('/', async (req, res) => {
   }
 });
 
-// api/users/id GET route
-router.get('/:id', async (req, res) => {
+// api/users/id PUT route
+router.put('/:id', async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).send('User not found');
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { username: req.body.username, email: req.body.email } },
+      { new: true }
+    );
+    if (!updatedUser) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.json(updatedUser);
     }
-    res.status(200).json(user);
   } catch (err) {
-    handleError(err, res);
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
   }
 });
 
-module.exports = router;
+// api/users/ id DELETE route
+router.delete('/:id', async (req, res) => {
+  try {
+    const deletedUser = await User.findOneAndDelete({ _id: req.params.id });
+    if (!deletedUser) {
+      res.status(404).json({ message: 'User not found' });
+    } else {
+      res.status(204).json({ message: 'User deleted successfully' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Something went wrong' });
+  }
+});

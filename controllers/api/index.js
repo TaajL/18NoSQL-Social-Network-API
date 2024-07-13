@@ -1,5 +1,6 @@
 //const express = require('express');
 const express = require('express').logRequest;
+const app = express();
 const router = express.Router();
 const userRoutes = require('./userRoutes.js');
 const thoughtRoutes = require('./thoughtRoutes.js');

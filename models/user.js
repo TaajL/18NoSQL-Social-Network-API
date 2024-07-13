@@ -16,10 +16,10 @@ const userSchema = new Schema({
       message: 'Invalid email address',
     },
   },
-  thoughts: [{ type: Schema.Types.ObjectId, ref: 'Thought' }],
+  thoughts: [{ type: Schema.Types.ObjectId, ref: 'thought' }],
   friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('user', userSchema);
 
 module.exports = User;

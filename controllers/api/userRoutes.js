@@ -1,7 +1,8 @@
-const { Router } = require('express');
+// const { Router } = require('express');
+const router = require('express').Router();
 const { User } = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-API/models/user.js');
 
-const router = Router();
+//const router = Router();
 
 // Helper function to handle errors
 const handleError = (err, res) => {

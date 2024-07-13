@@ -1,5 +1,6 @@
-const User = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-API/models/user.js');
-const Thought = require('./Thought.js');
+//const User = require('./models/user.js');
+const User = require('./user.js');
+const Thought = require('./thoughts.js');
 const reactionSchema = require('./reactionSchema.js');
 
 module.exports = { User, Thought, reactionSchema };

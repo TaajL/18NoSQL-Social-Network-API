@@ -28,18 +28,29 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// api/thoughts POST route
+//api/thoughts POST route
 router.post('/', async (req, res) => {
   try {
     const { thoughtText, username, userId } = req.body;
     const newThought = new Thought({ thoughtText, username, userId });
     const savedThought = await newThought.save();
+
+    // Add the new thought to the user's thoughts array
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    user.thoughts.push(savedThought._id);
+    await user.save();
+
     res.status(201).json(savedThought);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+
+
 
 // /api/thoughts/:id PUT route - Update a thought by ID
 router.put("/:id", async (req, res) => {
@@ -79,6 +90,13 @@ router.delete("/:id", async (req, res) => {
     if (!deletedThought) {
       res.status(404).json({ message: "Thought not found" });
       return;
+    }
+
+    // Remove the thought from the user's thoughts array
+    const user = await User.findById(deletedThought.userId);
+    if (user) {
+      user.thoughts.pull(deletedThought._id);
+      await user.save();
     }
 
     // Return a 200 OK status with a success message

@@ -1,6 +1,6 @@
 // const { Router } = require('express');
 const router = require('express').Router();
-const { User } = require('/Users/rashaadlogan/bootcamp/18NoSQL-Social-Network-API/models/user.js');
+const { User } = require('../../models/');
 
 //const router = Router();
 
@@ -12,6 +12,7 @@ const handleError = (err, res) => {
 
 // GET /api/users - Retrieve all users
 router.get('/', async (req, res) => {
+  console.log("hello")
   try {
     const users = await User.find();
     res.status(200).json(users);
@@ -91,9 +92,9 @@ router.post('/:userId/addFriend/:friendId', async (req, res) => {
     const userId = req.params.userId;
     const friendId = req.params.friendId;
 
-    if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(friendId)) {
-      return res.status(400).json({ message: 'Invalid user or friend ID' });
-    }
+    // if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(friendId)) {
+    //   return res.status(400).json({ message: 'Invalid user or friend ID' });
+    // }
 
     const user = await User.findByIdAndUpdate(userId, { $push: { friends: friendId } }, { new: true });
     if (!user) {
@@ -125,3 +126,5 @@ router.delete('/:userId/removeFriend/:friendId', async (req, res) => {
     handleError(err, res);
   }
 });
+
+module.exports = router

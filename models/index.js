@@ -3,4 +3,4 @@ const User = require('./user.js');
 const Thought = require('./thoughts.js');
 const reactionSchema = require('./reactionSchema.js');
 
-module.exports = { User, Thought, reactionSchema };
+module.exports = { User, Thought };

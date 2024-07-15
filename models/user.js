@@ -20,6 +20,6 @@ const userSchema = new Schema({
   friends: [{ type: Schema.Types.ObjectId, ref: 'User' }],
 });
 
-const User = mongoose.model('user', userSchema);
+const User = mongoose.model('User', userSchema);
 
 module.exports = User;
